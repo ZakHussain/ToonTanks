@@ -1,0 +1,100 @@
+A BasePawn Class based on UE4 Pawn class:
+	- Actor
+	- Pawn
+	- Character
+===================================================================================================
+
+====================================
+--------------
+Section One: 
+--------------
+Goal: in BasePawn.cpp, I need to reassign the RootComponent variable from being a USceneComponent to a UCapsuleComponent
+NOTE: Pawns inherit RootComponent from the Actor class. This variable stores the transform of the pawn.
+
+1. Create a BasePawn.cpp
+2. Create a BP named BP_ComponentsActor 
+3. In BP_ComponentActor, Attach a Capsule component to the DefaultSceneRoot Component
+4. In BP_ComponentActor, Attach the remaining derived components.
+	The result gives the following hierarchy: 
+	> DefaultSceneRoot
+		>> Capsule
+			>>> BaseMesh
+				>>>> TurretMesh
+					>>>>> ProjectileSpawnPoint
+5. In BP_ComponentActor hierarchy, attach the assets (i.e., static mesh bodies) to their respective components. (e.g., SM_TankBase mesh is add to the BaseMesh) 
+
+>>>The BP_ComponentsActor is set. 
+
+----------------------
+Section One, Part Two:
+------------------------
+1. In BasePawn.h, create a private section
+2. In BasePawn.h's private section, ForwardDeclare a pointer CapsuleComp.
+	>>> UCapsuleComponent* CapsuleComponent
+
+3. In BasePawn.cpp, ABasePawn::ABasePawn(), declare a Pointer named CapsuleComponent.
+  Note: Construct this using CreateDefaultSubObject<>() template function and return a UCapsuleComponent
+4. In ABasePawn::ABasePawn(), Reassign RootComponent to the CapsuleComponent
+
+---------------------
+Section One, Part Three
+------------------
+1.in BasePawn.h, ForwardDeclare Pointers to the UStaticMeshes for the body and turret, and USceneComponent for ProjectSpawnPoint
+2. setup attachement for Capsule and BaseMesh
+3. setup attachment for Basemesh and TurretMesh
+	- use TurretMesh->SetupAttachment(BaseMesh)
+4. setup attachment for TurretMesh and ProjectileSpawnPoint
+=================================================================================================
+=============================================================================================
+
+SECTION TWO
+Goal: Expose C++ Variables to Blueprint Properties
+================================================================
+===============================================================
+--------------
+Section Two, Part One
+
+1. create a child BluePrint Class from the BasePawn class; name the child BP_PawnTank
+	(i.e., left click BasePawn and select "create BluePrint class based on C++")
+
+2. QUICK MiniTest
+	- in BasePawn.cpp
+		- create an int32 someName;
+		- use the UPROPERTY macro to test the specifiers
+			> VisibleDefaultOnly   - only default objects can be read
+			> VisibleInstanceOnly	- only an instance derived from the default class can read this value
+			> VisibleAnywhere	- both default and additional instances can read this value
+			
+			> EditDefaultsOnly	- we can  only edit this value in default object. 
+			> EditInstanceOnly	- we can only edit this value in instances derived from default objects.
+			> EditAnwhere		- we can edit in both default and additional instances
+
+		- additionally, as a second parameter to UPROPERTY(,)
+			> BluePrintReadOnly
+			> BluePrintWriteOnly
+			> BluePrintReadWrite
+	- in the BP_Pawntank class, create a print statement through the event graph to play observe how the specifiers
+	  are effected in UE4
+	- Now try creating categories with UPROPERTY
+		Example (use the meta param if the variable was placed in a private section):
+		UProperty(VisibleAnywhere, BluePrintReadWrite, Category="FooCategoryname", meta=AllowPrivateAccess="true"))
+		
+3. Expose Components in BasePawn.h by setting the UPROPERTY macro on the
+	- CapsuleCOmponent
+	- BaseMeshComponent
+	- TurretMeshComponent
+	- ProjectileSpawnPoint
+	
+	**KEY NOTE**
+	In UProperty, when placed in a private section, EditAnywhere and VisibleAnywhere specifiers
+	cause a compilation error.
+	
+	SOLUTION - use meta. Here is an example
+		Ex.
+		UPROPERTY(VisibleAnywhere, BluePrintReadWrite, meta=(AllowPrivateAccess="true"));
+
+4. in BP_PawnTank, with the properties set:
+	- size the staticmeshes
+	- position the capsule
+	- position the ProjectileSpacePoint
+---------------------------

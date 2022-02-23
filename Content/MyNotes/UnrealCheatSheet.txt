@@ -1,0 +1,71 @@
+Classes:
+
+
+---------------------------------------------------------
+Components:
+
+UCapsuleComponent := a capsule for collision.
+#include "Components/CapsuleComponent.h
+
+UStaticMeshComponent
+#include "Components/StaticMeshComponent.h
+
+USceneComponent := contains transform info for component, but no body
+#include "Components/SceneComponent"
+--------------------------------------------------------------
+Macros:
+TEXT()
+UPROPERTY(exposureToObjects, exposureToBluePrints, category, meta=AllowPrivateAccess="true" ) := allows a variable to participate in the Reflection System
+---------------------------------------------------------------
+Templates:
+CreateDefaultSubObject<>() := Create a component or subobject 
+#include "UObject/UObjectGlobals.h
+Example: 
+CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshName));
+---------------------------------------------------------------
+Functions:
+
+SceneComponent::SetupAttachment := Inits desired Attach Parent and SocektName to be attached to when the component is registered.
+#include "Components/SceneComponent.h"
+Example:
+>>>
+UCapsuleComponent* CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
+UStaticMeshComponent* BaseMeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BaseMesh"));
+BaseMeshComp->SetupAttachment(TEXT("Capsule")); 
+>>>
+---------------------------------------------------------------------
+variables:
+AActor::RootComponent
+------------------------------------------------------------------------
+Property Specifiers:
+
+Read Only:
+	- Defaults
+		- VisibleAnywhere
+		- VisibleDefaultsOnly
+	- Instances
+		- VisibleAnywhere
+		- VisibleInstanceOnly
+	- EventGraph
+		-BluePrintReadOnly
+Write Only:
+	- EventGraph
+		-BluePrintWriteOnly
+
+Read/Write(set):
+	- Defaults
+		- EditAnywhere
+		- EditDefaultOnly		
+	- Instances
+		- EditAnywhere
+		- EditInstanceOnly
+	- EventGraph
+		-BluePrintReadWrite
+--------------------------------------------------------------------------
+Engine:
+Reflection System := Exposes variables to BluePrints and GarbageCollection.
+Forward Decleration := Helps use get away with adding in a Scope SomeClass.h file when using a function from SomeClass.h
+			example: in MyFooClass.h 
+				line x: 
+				class UCapsuleComponent* CapsuleComponent;
+			In the MyFooClass.cpp however, I will use IWYU  and add the SomeClass.h file to my includes section 
